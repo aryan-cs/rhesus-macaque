@@ -1,7 +1,6 @@
 #ifndef INPUT_NEURON_H
 #define INPUT_NEURON_H
 
-
 #include <iostream>
 #include <vector>
 #include <numeric>
@@ -26,14 +25,11 @@ public:
             nueron.AddConnection();
         }
     }
-    
+
     template <typename T>
-    void FeedNextLayer (vector<T>& next_layer) {
-        for (T& nueron : next_layer) {
-            nueron.ClearInputs();
-        }
-        for (T& nueron : next_layer) {
-            nueron.AddInput(value);
+    void FeedNextLayer (int i, vector<T>& next_layer) {
+        for (T& n : next_layer) {
+            n.SetInput(i, value);
         }
     }
 

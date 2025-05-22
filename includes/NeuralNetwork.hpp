@@ -2,8 +2,6 @@
 #define hidden_layers_H
 
 #include "InputNeuron.hpp"
-#include "Perceptron.hpp"
-#include "SigmoidNeuron.hpp"
 
 #include <iostream>
 #include <vector>
@@ -55,6 +53,12 @@ public:
 
     void HelloWorld () { cout << "Hello, Neural Network!" << endl; };
 
+    void SetInputs (vector <decimal> inps) {
+        for (int n = 0; n < input_layer.size(); ++n) {
+            input_layer[n].SetValue(inps[n]);
+        }
+    }
+
     vector <InputNeuron>& GetInputLayer () { return input_layer; }
 
     vector <vector <T>>& GetHiddenLayers () { return hidden_layers; }
@@ -65,6 +69,19 @@ public:
             cost += ((hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o])(hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o]));
         }
         return cost;
+    }
+
+
+    void FeedForward () {
+        for (int n = 0; n < input_layer.size(); ++n) {
+            input_layer[n].FeedNextLayer(n, hidden_layers[0]);
+        }
+        for (int l = 0; l < hidden_layers.size() - 1; ++l) {
+            for (int n = 0; n < hidden_layers[l].size(); ++n) {
+                hidden_layers[l][n].CalculateActivation();
+                hidden_layers[l][n].FeedNextLayer(n, hidden_layers[l + 1]);
+            }
+        }
     }
 
     friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<T>& nn) {

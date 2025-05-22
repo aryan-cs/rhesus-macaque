@@ -15,11 +15,14 @@ int main() {
     cout << "\nHello, Main!" << endl;
 
     NeuralNetwork<SigmoidNeuron> nn({4, 3, 2});
+    nn.Initialize();
+
+    vector <decimal> inputs = {1.0, 1.0, 0.75, 1.0};
+    nn.SetInputs(inputs);
+
+    nn.FeedForward();
 
     cout << nn << endl;
-
-    nn.Initialize();
-    cout << nn.GetInputLayer().size() << endl;
 
     return 0;
 }

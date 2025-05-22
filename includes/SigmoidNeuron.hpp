@@ -9,27 +9,14 @@
 using namespace std;
 using decimal = float;
 
-class SigmoidNeuron : public Perceptron {
+class SigmoidNeuron {
 public:
     SigmoidNeuron () { /* cout << "> Sigmoid Neuron created!" << endl; */ };
     ~SigmoidNeuron () { /* cout << "> Sigmoid Neuron destroyed!" << endl */ };
 
     void HelloWorld () { cout << "Hello, Sigmoid Neuron!" << endl; };
 
-    decimal ActivationFunction () {
-        // z = w.i + b
-        decimal z = inner_product(weights.begin(), 
-                                  weights.end(), 
-                                  inputs.begin(), 
-                                  bias);
-
-        // Sigmoid Function: 1 / (1 + exp(-z))
-        output = 1 / (1 + exp(-z));
-
-        return output;
-    }
-
-    void AddInput (decimal i) { inputs.push_back(i); }
+    void SetInput (decimal i, decimal v) { inputs[i] = v; }
     vector <decimal>& GetInputs () { return inputs; }
     void ClearInputs () { inputs.clear(); }
 
@@ -43,7 +30,7 @@ public:
         static std::mt19937 gen(rd());
         static normal_distribution<decimal> dist(/* mean = */ 0.0, /* stdev = */ 0.25);
 
-        inputs.push_back(dist(gen));
+        inputs.push_back(0);
         weights.push_back(dist(gen));
     }
 
@@ -61,10 +48,22 @@ public:
         }
     }
 
-    void FeedNextLayer (vector<SigmoidNeuron>& next_layer) {
+    decimal CalculateActivation () {
+        // z = w.i + b
+        decimal z = inner_product(weights.begin(), 
+                                  weights.end(), 
+                                  inputs.begin(), 
+                                  bias);
+
+        // Sigmoid Function: 1 / (1 + exp(-z))
+        output = 1 / (1 + exp(-z));
+
+        return output;
+    }
+
+    void FeedNextLayer (int i, vector<SigmoidNeuron>& next_layer) {
         for (SigmoidNeuron& s : next_layer) {
-            s.ClearInputs();
-            s.AddInput(output);
+            s.SetInput(i, output);
         }
     }
     

@@ -16,7 +16,7 @@ public:
 
     void HelloWorld () { cout << "Hello, Perceptron!" << endl; };
 
-    void AddInput (decimal i) { inputs.push_back(i); }
+    void SetInput (decimal i, decimal v) { inputs[i] = v; }
     vector <decimal>& GetInputs () { return inputs; }
     void ClearInputs () { inputs.clear(); }
 
@@ -25,25 +25,12 @@ public:
 
     bool& GetOutput () { return output; }
 
-    bool ActivationFunction () {
-        // w.i + b
-        decimal weighted_sum = inner_product(weights.begin(), 
-                                             weights.end(), 
-                                             inputs.begin(), 
-                                             bias);
-
-        // Heaviside Step Function: 1 iff w.i + b > 0
-        output = (weighted_sum > 0);
-
-        return output;
-    }
-
     void AddConnection () {
         static std::random_device rd;
         static std::mt19937 gen(rd());
         static normal_distribution<decimal> dist(/* mean = */ 0.0, /* stdev = */ 0.25);
 
-        inputs.push_back(dist(gen));
+        inputs.push_back(0);
         weights.push_back(dist(gen));
     }
 
@@ -62,10 +49,22 @@ public:
         }
     }
 
-    void FeedNextLayer (vector<Perceptron>& next_layer) {
+    bool ActivationFunction () {
+        // w.i + b
+        decimal weighted_sum = inner_product(weights.begin(), 
+                                             weights.end(), 
+                                             inputs.begin(), 
+                                             bias);
+
+        // Heaviside Step Function: 1 iff w.i + b > 0
+        output = (weighted_sum > 0);
+
+        return output;
+    }
+
+    void FeedNextLayer (int i, vector<Perceptron>& next_layer) {
         for (Perceptron& p : next_layer) {
-            p.ClearInputs();
-            p.AddInput(output);
+            p.SetInput(i, output);
         }
     }
     
