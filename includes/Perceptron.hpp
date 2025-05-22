@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
+#include <random>
 
 using namespace std;
 using decimal = float;
@@ -15,20 +16,14 @@ public:
 
     void HelloWorld () { cout << "Hello, Perceptron!" << endl; };
 
-    void Initialize () {
-        srand(time(0));
-        bias = ((decimal) rand()) / RAND_MAX;
-        for (decimal w : weights) {
-            w = ((decimal) rand()) / RAND_MAX;
-        }
-    }
-
-    vector <decimal> GetInputs () { return inputs; }
+    void AddInput (decimal i) { inputs.push_back(i); }
+    vector <decimal>& GetInputs () { return inputs; }
     void ClearInputs () { inputs.clear(); }
-    vector <decimal> GetWeights () { return weights; }
-    bool GetOutput () { return output; }
-    void InitializeInput () { inputs.push_back(0); }
-    void InitializeWeight () { weights.push_back(0); }
+
+    void AddWeight(decimal w) { weights.push_back(w); }
+    vector <decimal>& GetWeights () { return weights; }
+
+    bool& GetOutput () { return output; }
 
     bool ActivationFunction () {
         // w.i + b
@@ -43,10 +38,34 @@ public:
         return output;
     }
 
-    void FeedNextLayer (vector<Perceptron> next_layer) {
-        for (Perceptron p : next_layer) {
-            p.GetInputs().clear();
-            p.GetInputs().push_back(output);
+    void AddConnection () {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static normal_distribution<decimal> dist(/* mean = */ 0.0, /* stdev = */ 0.25);
+
+        inputs.push_back(dist(gen));
+        weights.push_back(dist(gen));
+    }
+
+    void InitializeBias () {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static normal_distribution<decimal> dist(/* mean = */ 0.0, /* stdev = */ 0.25);
+        
+        bias = dist(gen);
+    }
+
+
+    void ConnectTo (vector<Perceptron>& next_layer) {
+        for (Perceptron& p : next_layer) {
+            p.AddConnection();
+        }
+    }
+
+    void FeedNextLayer (vector<Perceptron>& next_layer) {
+        for (Perceptron& p : next_layer) {
+            p.ClearInputs();
+            p.AddInput(output);
         }
     }
     
@@ -54,7 +73,7 @@ private:
     vector <decimal> inputs;
     vector <decimal> weights;
     decimal bias;
-    bool output;
+    bool output = 0;
 };
 
 #endif

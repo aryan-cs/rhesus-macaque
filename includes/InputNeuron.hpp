@@ -19,21 +19,21 @@ public:
     decimal GetValue () { return value; }
 
     void SetValue (const decimal& v) { value = v; }
-    
+
     template <typename T>
-    void InitializeNextLayer (vector<T>& next_layer) {
+    void ConnectTo (vector<T>& next_layer) {
         for (T& nueron : next_layer) {
-            // nueron.ClearInputs();
-            nueron.InitializeInput();
-            nueron.InitializeWeight();
+            nueron.AddConnection();
         }
     }
-
+    
     template <typename T>
     void FeedNextLayer (vector<T>& next_layer) {
         for (T& nueron : next_layer) {
-            // continue here
-            // think about indexing
+            nueron.ClearInputs();
+        }
+        for (T& nueron : next_layer) {
+            nueron.AddInput(value);
         }
     }
 

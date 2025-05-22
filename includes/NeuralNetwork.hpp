@@ -29,30 +29,35 @@ public:
     
     ~NeuralNetwork () {};
 
-    void Initialize () {
-        for (InputNeuron i_p : input_layer) {
-            i_p.FeedNextLayer(hidden_layers[0]);
+    void ClearNetwork () {
+        for (InputNeuron& i_p : input_layer) {
+            i_p.SetValue(0.0);
         }
         for (int l = 0; l < hidden_layers.size() - 1; ++l) {
-            for (int n = 0; n < hidden_layers[l].size(); ++n) {
-                hidden_layers[l][n].Initialize();
-                hidden_layers[l][n].FeedNextLayer(hidden_layers[l + 1]);
+            for (T& node : hidden_layers[l]) {
+                node.ClearInputs();
+            }
+        }
+    }
+
+    void Initialize () {
+        ClearNetwork();
+        for (InputNeuron& i_p : input_layer) {
+            i_p.ConnectTo(hidden_layers[0]);
+        }
+        for (int l = 0; l < hidden_layers.size(); ++l) {
+            for (T& node : hidden_layers[l]) {
+                if (l < hidden_layers.size() - 1) node.ConnectTo(hidden_layers[l + 1]);
+                node.InitializeBias();
             }
         }
     }
 
     void HelloWorld () { cout << "Hello, Neural Network!" << endl; };
 
-    vector <InputNeuron> GetInputLayer () { return input_layer; }
+    vector <InputNeuron>& GetInputLayer () { return input_layer; }
 
-    vector <vector <T>> GetHiddenLayers () { return hidden_layers; }
-
-    friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<T>& nn) {
-        os << "[" << nn.input_layer.size() << "] → "; 
-        for (vector<T> layer : nn.hidden_layers) { os << "[" << layer.size() << "] → "; }
-        os << "[ ]";
-        return os;
-    }
+    vector <vector <T>>& GetHiddenLayers () { return hidden_layers; }
 
     decimal Cost(vector <decimal> ideal_outputs) {
         decimal cost = 0.0;
@@ -60,6 +65,13 @@ public:
             cost += ((hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o])(hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o]));
         }
         return cost;
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<T>& nn) {
+        os << "[" << nn.input_layer.size() << "] → "; 
+        for (vector<T> layer : nn.hidden_layers) { os << "[" << layer.size() << "] → "; }
+        os << "[ ]";
+        return os;
     }
     
 private:

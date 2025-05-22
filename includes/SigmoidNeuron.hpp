@@ -16,9 +16,6 @@ public:
 
     void HelloWorld () { cout << "Hello, Sigmoid Neuron!" << endl; };
 
-    vector <decimal> GetInputs () { return inputs; }
-    decimal GetOutput () { return output; }
-
     decimal ActivationFunction () {
         // z = w.i + b
         decimal z = inner_product(weights.begin(), 
@@ -32,10 +29,42 @@ public:
         return output;
     }
 
-    void FeedNextLayer (vector<SigmoidNeuron> next_layer) {
-        for (SigmoidNeuron s : next_layer) {
-            s.GetInputs().clear();
-            s.GetInputs().push_back(output);
+    void AddInput (decimal i) { inputs.push_back(i); }
+    vector <decimal>& GetInputs () { return inputs; }
+    void ClearInputs () { inputs.clear(); }
+
+    void AddWeight(decimal w) { weights.push_back(w); }
+    vector <decimal>& GetWeights () { return weights; }
+
+    decimal& GetOutput () { return output; }
+
+    void AddConnection () {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static normal_distribution<decimal> dist(/* mean = */ 0.0, /* stdev = */ 0.25);
+
+        inputs.push_back(dist(gen));
+        weights.push_back(dist(gen));
+    }
+
+    void InitializeBias () {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static normal_distribution<decimal> dist(/* mean = */ 0.0, /* stdev = */ 0.25);
+        
+        bias = dist(gen);
+    }
+
+    void ConnectTo (vector<SigmoidNeuron>& next_layer) {
+        for (SigmoidNeuron& s : next_layer) {
+            s.AddConnection();
+        }
+    }
+
+    void FeedNextLayer (vector<SigmoidNeuron>& next_layer) {
+        for (SigmoidNeuron& s : next_layer) {
+            s.ClearInputs();
+            s.AddInput(output);
         }
     }
     
@@ -43,7 +72,7 @@ private:
     vector <decimal> inputs;
     vector <decimal> weights;
     decimal bias;
-    decimal output;
+    decimal output = 0.0;
 };
 
 #endif
