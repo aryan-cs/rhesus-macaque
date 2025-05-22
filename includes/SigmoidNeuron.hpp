@@ -9,7 +9,6 @@
 using namespace std;
 using decimal = float;
 
-template <typename T>
 class SigmoidNeuron : public Perceptron {
 public:
     SigmoidNeuron () { /* cout << "> Sigmoid Neuron created!" << endl; */ };
@@ -20,7 +19,7 @@ public:
     vector <decimal> GetInputs () { return inputs; }
     decimal GetOutput () { return output; }
 
-    bool ActivationFunction () {
+    decimal ActivationFunction () {
         // z = w.i + b
         decimal z = inner_product(weights.begin(), 
                                   weights.end(), 
@@ -28,7 +27,7 @@ public:
                                   bias);
 
         // Sigmoid Function: 1 / (1 + exp(-z))
-        output = 1 / (1 + exp(-z))
+        output = 1 / (1 + exp(-z));
 
         return output;
     }

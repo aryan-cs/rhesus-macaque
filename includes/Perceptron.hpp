@@ -8,15 +8,14 @@
 using namespace std;
 using decimal = float;
 
-template <typename T>
 class Perceptron {
 public:
-    Perceptron () { /* cout << "> Perceptron created!" << endl; */ };
-    ~Perceptron () { /* cout << "> Perceptron destroyed!" << endl */ };
+    Perceptron () {};
+    ~Perceptron () {};
 
     void HelloWorld () { cout << "Hello, Perceptron!" << endl; };
 
-    vector <bool> GetInputs () { return inputs; }
+    vector <decimal> GetInputs () { return inputs; }
     bool GetOutput () { return output; }
 
     bool ActivationFunction () {
@@ -39,7 +38,7 @@ public:
     }
     
 private:
-    vector <T> inputs;
+    vector <decimal> inputs;
     vector <decimal> weights;
     decimal bias;
     bool output;

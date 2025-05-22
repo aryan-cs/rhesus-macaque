@@ -1,6 +1,7 @@
 #include "Perceptron.hpp"
 #include "InputNeuron.hpp"
-// #include "SigmoidNeuron.hpp"
+#include "SigmoidNeuron.hpp"
+#include "NeuralNetwork.hpp"
 
 #include <iostream>
 #include <vector>
@@ -13,10 +14,9 @@ int main() {
 
     cout << "\nHello, Main!" << endl;
 
-    int input_layer_size = 784;
-    int first_layer_size = 16;
-    vector <Perceptron<decimal>> input_layer(input_layer_size);
-    vector <Perceptron<decimal>> first_layer(first_layer_size);
+    NeuralNetwork<Perceptron> nn({784, 16, 16, 10});
+
+    cout << nn << endl;
 
     return 0;
 }
