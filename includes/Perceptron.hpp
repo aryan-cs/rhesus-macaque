@@ -15,8 +15,20 @@ public:
 
     void HelloWorld () { cout << "Hello, Perceptron!" << endl; };
 
+    void Initialize () {
+        srand(time(0));
+        bias = ((decimal) rand()) / RAND_MAX;
+        for (decimal w : weights) {
+            w = ((decimal) rand()) / RAND_MAX;
+        }
+    }
+
     vector <decimal> GetInputs () { return inputs; }
+    void ClearInputs () { inputs.clear(); }
+    vector <decimal> GetWeights () { return weights; }
     bool GetOutput () { return output; }
+    void InitializeInput () { inputs.push_back(0); }
+    void InitializeWeight () { weights.push_back(0); }
 
     bool ActivationFunction () {
         // w.i + b
@@ -33,6 +45,7 @@ public:
 
     void FeedNextLayer (vector<Perceptron> next_layer) {
         for (Perceptron p : next_layer) {
+            p.GetInputs().clear();
             p.GetInputs().push_back(output);
         }
     }

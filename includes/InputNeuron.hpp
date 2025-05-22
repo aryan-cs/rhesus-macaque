@@ -11,8 +11,7 @@ using decimal = float;
 
 class InputNeuron {
 public:
-    InputNeuron() : value(decimal {}) {};
-    InputNeuron (decimal v) : value(v) { };
+    InputNeuron() {};
     ~InputNeuron () {};
 
     void HelloWorld () { cout << "Hello, Input Neuron!" << endl; };
@@ -22,9 +21,19 @@ public:
     void SetValue (const decimal& v) { value = v; }
     
     template <typename T>
-    void FeedNextLayer (vector<T> next_layer) {
-        for (T nueron : next_layer) {
-            nueron.GetInputs().push_back(value);
+    void InitializeNextLayer (vector<T>& next_layer) {
+        for (T& nueron : next_layer) {
+            // nueron.ClearInputs();
+            nueron.InitializeInput();
+            nueron.InitializeWeight();
+        }
+    }
+
+    template <typename T>
+    void FeedNextLayer (vector<T>& next_layer) {
+        for (T& nueron : next_layer) {
+            // continue here
+            // think about indexing
         }
     }
 

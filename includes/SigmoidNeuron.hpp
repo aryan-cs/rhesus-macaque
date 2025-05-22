@@ -34,6 +34,7 @@ public:
 
     void FeedNextLayer (vector<SigmoidNeuron> next_layer) {
         for (SigmoidNeuron s : next_layer) {
+            s.GetInputs().clear();
             s.GetInputs().push_back(output);
         }
     }

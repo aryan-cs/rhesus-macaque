@@ -1,5 +1,5 @@
-#ifndef NEURAL_NETWORK_H
-#define NEURAL_NETWORK_H
+#ifndef hidden_layers_H
+#define hidden_layers_H
 
 #include "InputNeuron.hpp"
 #include "Perceptron.hpp"
@@ -18,20 +18,38 @@ public:
     
     template <size_t N>
     NeuralNetwork(const int (&layers)[N]) {
-        neural_network.emplace_back(layers[0]);
+        for (int i_p = 0; i_p < layers[0]; ++i_p) {
+            input_layer.push_back(InputNeuron());
+        }
         
         for (int l = 1; l < N; ++l) {
-            neural_network.emplace_back(layers[l]);
+            hidden_layers.emplace_back(layers[l]);
         }
     }
     
     ~NeuralNetwork () {};
 
+    void Initialize () {
+        for (InputNeuron i_p : input_layer) {
+            i_p.FeedNextLayer(hidden_layers[0]);
+        }
+        for (int l = 0; l < hidden_layers.size() - 1; ++l) {
+            for (int n = 0; n < hidden_layers[l].size(); ++n) {
+                hidden_layers[l][n].Initialize();
+                hidden_layers[l][n].FeedNextLayer(hidden_layers[l + 1]);
+            }
+        }
+    }
+
     void HelloWorld () { cout << "Hello, Neural Network!" << endl; };
 
+    vector <InputNeuron> GetInputLayer () { return input_layer; }
+
+    vector <vector <T>> GetHiddenLayers () { return hidden_layers; }
+
     friend std::ostream& operator<<(std::ostream& os, const NeuralNetwork<T>& nn) {
-        
-        for (vector<T> layer : nn.neural_network) { os << "[" << layer.size() << "] → "; }
+        os << "[" << nn.input_layer.size() << "] → "; 
+        for (vector<T> layer : nn.hidden_layers) { os << "[" << layer.size() << "] → "; }
         os << "[ ]";
         return os;
     }
@@ -39,13 +57,14 @@ public:
     decimal Cost(vector <decimal> ideal_outputs) {
         decimal cost = 0.0;
         for (int o = 0; o < ideal_outputs.size(); ++o) {
-            cost += ((neural_network[neural_network.size() - 1][o] - ideal_outputs[o])(neural_network[neural_network.size() - 1][o] - ideal_outputs[o]));
+            cost += ((hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o])(hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o]));
         }
         return cost;
     }
     
 private:
-    vector <vector <T>> neural_network;
+    vector <InputNeuron> input_layer;
+    vector <vector <T>> hidden_layers;
 };
 
 #endif
