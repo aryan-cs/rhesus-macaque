@@ -2,6 +2,8 @@
 
 .git/
 
+.gitignore
+
 src/main.exe
 
 *.o
