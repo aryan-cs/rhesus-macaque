@@ -6,7 +6,7 @@ A lightweight C++ implementation of a neural network framework that uses the Sig
 ## Links & References
 
 - [Michael Nielsen's Book on Nueral Networks and Deep Learning](http://neuralnetworksanddeeplearning.com/chap1.html)
-- [3blue1brown's Series on Neural Networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
+- [3Blue1Brown's Series on Neural Networks](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
 
 ##
 
