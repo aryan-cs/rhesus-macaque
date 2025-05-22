@@ -10,4 +10,4 @@ A lightweight C++ implementation of a neural network framework that uses the Sig
 
 ##
 
-![Rhesus Macaque](https://www.joelsartore.com/wp-content/uploads/stock/ANI108/ANI108-00153-1920x1279.jpg)
+![Rhesus Macaque](https://raw.githubusercontent.com/aryan-cs/rhesus-macaque/refs/heads/master/rhesus-macaque.jpg)
