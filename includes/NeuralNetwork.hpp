@@ -65,11 +65,14 @@ public:
 
     decimal Cost(vector <decimal> ideal_outputs) {
         decimal cost = 0.0;
-        for (int o = 0; o < ideal_outputs.size(); ++o) {
-            cost += ((hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o])(hidden_layers[hidden_layers.size() - 1][o] - ideal_outputs[o]));
+        int o = 0;
+        for (; o < ideal_outputs.size(); ++o) {
+            decimal error = hidden_layers.back()[o].GetOutput() - ideal_outputs[o];
+            cost += error * error;
         }
-        return cost;
+        return cost / (2 * o);
     }
+
 
 
     void FeedForward () {
@@ -81,6 +84,9 @@ public:
                 hidden_layers[l][n].CalculateActivation();
                 hidden_layers[l][n].FeedNextLayer(n, hidden_layers[l + 1]);
             }
+        }
+        for (int n = 0; n < hidden_layers[hidden_layers.size() - 1].size(); ++n) {
+            hidden_layers[hidden_layers.size() - 1][n].CalculateActivation();
         }
     }
 

@@ -17,12 +17,15 @@ int main() {
     NeuralNetwork<SigmoidNeuron> nn({4, 3, 2});
     nn.Initialize();
 
-    vector <decimal> inputs = {1.0, 1.0, 0.75, 1.0};
-    nn.SetInputs(inputs);
+    vector <decimal> inputs = {1.0, 1.0, 0, 0};
+    vector <decimal> outputs = {1.0, 0};
 
+    nn.SetInputs(inputs);
     nn.FeedForward();
 
-    cout << nn << endl;
+    decimal c = nn.Cost(outputs);
+
+    cout << "Error: " << c << endl;
 
     return 0;
 }
