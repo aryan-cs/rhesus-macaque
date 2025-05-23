@@ -17,13 +17,14 @@ public:
     void HelloWorld () { cout << "Hello, Sigmoid Neuron!" << endl; };
 
     void SetInput (decimal i, decimal v) { inputs[i] = v; }
-    vector <decimal>& GetInputs () { return inputs; }
+    const vector <decimal>& GetInputs () { return inputs; }
     void ClearInputs () { inputs.clear(); }
-
     void AddWeight(decimal w) { weights.push_back(w); }
-    vector <decimal>& GetWeights () { return weights; }
+    const vector <decimal>& GetWeights () { return weights; }
+    void UpdateWeight(int i, decimal delta) { weights[i] -= delta; }
+    void UpdateBias(decimal delta) { bias -= delta; }
 
-    decimal& GetOutput () { return output; }
+    const decimal& GetOutput () { return output; }
 
     void AddConnection () {
         static std::random_device rd;
