@@ -12,12 +12,28 @@
 using namespace std;
 using decimal = float;
 
-const decimal PRECISION = 1000.0;
-const decimal ERROR_THRESHOLD = 1;
-int EPOCHS = 5000;
-decimal LEARNING_RATE = 0.5;
+// Network Architecture
+const int INPUT_SIZE = 4;
+const int OUTPUT_SIZE = 2;
+const int EPOCHS = 10000; // Edit this!
+const decimal LEARNING_RATE = 0.5; // Edit this!
 
-struct TestData {
+// Designing Training Data
+const int DATASET_SIZE = 1000; // Edit this!
+const decimal ALLOCATED_TRAINING = 0.75;
+const decimal TRAINING_BOUND_LOWER = 0.0;
+const decimal TRAINING_BOUND_UPPER = 1.0;
+
+// Designing Validation Data
+const decimal ALLOCATED_VALIDATION = 1 - ALLOCATED_TRAINING;
+const decimal VALIDATION_BOUND_LOWER = 0.0;
+const decimal VALIDATION_BOUND_UPPER = 1.0;
+
+// Benchmark Metrics
+const decimal PRECISION = 10000.0;
+const decimal ERROR_THRESHOLD = 0.1; // Edit this!
+
+struct Data {
     vector<decimal> input;
     vector<decimal> output;
 };
@@ -38,65 +54,85 @@ decimal percentage_error (const vector<decimal>& preds, const vector<decimal>& t
     return with_precision(error);
 }
 
+vector <Data> DataSetBuilder (int DATASET_SIZE, 
+                              decimal DATA_LOWER, 
+                              decimal DATA_UPPER) {
+
+    std::mt19937 rng(0);
+    std::uniform_real_distribution<decimal> dist(DATA_LOWER, DATA_UPPER);
+
+    vector <Data> dataset;
+
+    for (int d = 0; d < DATASET_SIZE; ++d) {
+
+        vector<decimal> input(4);
+        for (auto& v : input) { v = dist(rng); }
+
+        vector<decimal> output = {average_of(input[0], input[1]), average_of(input[2], input[3])};
+        dataset.push_back({input, output});
+
+    }
+
+    return dataset;
+
+}
+
 
 int main() {
     cout << "\nHello, Main!\n" << endl;
 
-    NeuralNetwork<SigmoidNeuron> nn({4, 3, 2});
+    NeuralNetwork<SigmoidNeuron> nn({INPUT_SIZE, 3, OUTPUT_SIZE});
     nn.Initialize();
 
     cout << "Network Architecture: " << endl;
     cout << nn;
 
-    // Test Application: One-dimensional Array Quantization
-    // Ex: [1, 1, 0, 0] -> [1, 0]
-    vector<TestData> data = {
-        {{1, 1, 1, 1}, {1, 1}},
-        {{1, 1, 0, 0}, {1, 0}},
-        {{0, 0, 1, 1}, {0, 1}},
-        {{1, 1, 1, 0}, {1, 0.5}},
-        {{0, 1, 1, 1}, {0.5, 1}},
-        {{1, 0, 1, 0}, {0.5, 0.5}},
-        {{1, 0, 0, 1}, {0.5, 0.5}},
-        {{0, 1, 0, 1}, {0.5, 0.5}},
-        {{0, 1, 1, 0}, {0.5, 0.5}},
-        {{0, 1, 0, 0}, {0.5, 0}},
-        {{0, 0, 1, 0}, {0, 0.5}},
-        {{0, 0, 0, 0}, {0, 0}},
-    };
+    vector <Data> training_dataset = DataSetBuilder(round(DATASET_SIZE * ALLOCATED_TRAINING), 
+                                                    TRAINING_BOUND_LOWER, 
+                                                    TRAINING_BOUND_UPPER);
+
+    cout << "\n\nTraining Dataset Size: " << training_dataset.size() << endl;
+
+    vector <Data> validation_dataset = DataSetBuilder(round(DATASET_SIZE * ALLOCATED_VALIDATION), 
+                                                      VALIDATION_BOUND_LOWER, 
+                                                      VALIDATION_BOUND_UPPER);
+
+    cout << "Validation Dataset Size: " << validation_dataset.size() << endl;
 
     decimal total_cost = 0;
-    for (auto& d : data) {
+    for (auto& d : training_dataset) {
         nn.SetInputs(d.input);
         nn.FeedForward();
         total_cost += nn.Cost(d.output);
     }
 
-    cout << "\n\nInitial Average Cost: " << total_cost / data.size() << endl;
+    cout << "Initial Average Cost: " << total_cost / training_dataset.size() << endl;
 
     cout << "\nTraining...\n" << endl;
     for (int epoch = 0; epoch < EPOCHS; ++epoch) {
-        for (auto& d : data) {
+        for (auto& d : training_dataset) {
             nn.SetInputs(d.input);
             nn.FeedForward();
             nn.BackPropagation(d.output, LEARNING_RATE);
         }
 
+
+
         if (epoch % 1000 == 0) {
             decimal epoch_cost = 0;
-            for (auto& d : data) {
+            for (auto& d : training_dataset) {
                 nn.SetInputs(d.input);
                 nn.FeedForward();
                 epoch_cost += nn.Cost(d.output);
             }
-            cout << "Epoch " << epoch << " | Average Cost: " << epoch_cost / data.size() << endl;
+            cout << "Epoch " << epoch << " | Average Cost: " << epoch_cost / training_dataset.size() << endl;
         }
     }
 
-    cout << "\n--------------------------------------------------------------------------------" << endl;
-    cout << "\nPost-train Results:\n\n";
+    // cout << "\n--------------------------------------------------------------------------------" << endl;
+    // cout << "\nPost-train Results:\n\n";
 
-    for (auto& d : data) {
+    for (auto& d : training_dataset) {
         nn.SetInputs(d.input);
         nn.FeedForward();
         auto preds = nn.GetHiddenLayers().back();
@@ -106,33 +142,20 @@ int main() {
 
         decimal error = percentage_error(preds_vec, d.output);
 
-        cout << "[";
-        for (auto v : d.input) cout << with_precision(v) << ", ";
-        cout << "] -> [";
-        for (auto& n : preds) cout << with_precision(n.GetOutput()) << ", ";
-        cout << "] ~> [";
-        for (auto v : d.output) cout << with_precision(v) << ", ";
-        cout << "]\nError: " << with_precision(error) << "%";
-        cout << "\n" << endl;
+        // cout << "[";
+        // for (auto v : d.input) cout << with_precision(v) << ", ";
+        // cout << "] -> [";
+        // for (auto& n : preds) cout << with_precision(n.GetOutput()) << ", ";
+        // cout << "] ~> [";
+        // for (auto v : d.output) cout << with_precision(v) << ", ";
+        // cout << "]\nError: " << with_precision(error) << "%";
+        // cout << "\n" << endl;
     }
 
-    cout << "--------------------------------------------------------------------------------" << endl;
-    cout << "\nValidation Results:\n";
+    // cout << "--------------------------------------------------------------------------------" << endl;
+    // cout << "\nValidation Results:\n";
 
-    vector<TestData> validation_data;
-
-    std::mt19937 rng(0);
-    std::uniform_real_distribution<decimal> dist(0.0, 3.0);
-
-    const int val_samples = 10;
-    for (int i = 0; i < val_samples; ++i) {
-        vector<decimal> input(4);
-        for (auto& v : input) { v = dist(rng); }
-        vector<decimal> output = {average_of(input[0], input[1]), average_of(input[2], input[3])};
-        validation_data.push_back({input, output});
-    }
-
-    for (auto& d : validation_data) {
+    for (auto& d : validation_dataset) {
         nn.SetInputs(d.input);
         nn.FeedForward();
         auto preds = nn.GetHiddenLayers().back();
@@ -142,17 +165,17 @@ int main() {
 
         decimal error = percentage_error(preds_vec, d.output);
 
-        cout << "[";
-        for (auto v : d.input) cout << with_precision(v) << ", ";
-        cout << "] -> [";
-        for (auto& n : preds) cout << with_precision(n.GetOutput()) << ", ";
-        cout << "] ~> [";
-        for (auto v : d.output) cout << with_precision(v) << ", ";
-        cout << "]\nError: " << with_precision(error) << "%";
-        cout << "\n" << endl;
+        // cout << "[";
+        // for (auto v : d.input) cout << with_precision(v) << ", ";
+        // cout << "] -> [";
+        // for (auto& n : preds) cout << with_precision(n.GetOutput()) << ", ";
+        // cout << "] ~> [";
+        // for (auto v : d.output) cout << with_precision(v) << ", ";
+        // cout << "]\nError: " << with_precision(error) << "%";
+        // cout << "\n" << endl;
     }
 
-    auto compute_accuracy = [&](const vector<TestData>& dataset) {
+    auto compute_accuracy = [&](const vector<Data>& dataset) {
         int correct_count = 0;
         for (auto& d : dataset) {
             nn.SetInputs(d.input);
@@ -163,6 +186,7 @@ int main() {
             for (auto& n : preds) preds_vec.push_back(n.GetOutput());
 
             decimal error = percentage_error(preds_vec, d.output);
+
             if (error <= ERROR_THRESHOLD) { ++correct_count; }
         }
 
@@ -171,11 +195,11 @@ int main() {
 
     cout << "--------------------------------------------------------------------------------" << endl;
 
-    decimal train_accuracy = compute_accuracy(data);
+    decimal train_accuracy = compute_accuracy(training_dataset);
     cout << "\nTraining Data Accuracy   (error ≤ " << ERROR_THRESHOLD << "%): " 
         << with_precision(train_accuracy) << "%\n";
 
-    decimal val_accuracy = compute_accuracy(validation_data);
+    decimal val_accuracy = compute_accuracy(validation_dataset);
     cout << "Validation Data Accuracy (error ≤ " << ERROR_THRESHOLD << "%): " 
         << with_precision(val_accuracy) << "%\n";
 
