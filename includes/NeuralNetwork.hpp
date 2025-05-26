@@ -63,12 +63,24 @@ public:
     const vector <vector <T>>& GetHiddenLayers () { return hidden_layers; }
 
     const decimal Cost(vector <decimal> ideal_outputs) {
+        // // Mean Squared Error
+        // // cost = 1 / (2 * n) * sum((y - y_hat)^2)
+        // decimal cost = 0.0;
+        // for (size_t o = 0; o < ideal_outputs.size(); ++o) {
+        //     decimal error = hidden_layers.back()[o].GetOutput() - ideal_outputs[o];
+        //     cost += error * error;
+        // }
+        // return cost / (2 * ideal_outputs.size());
+
+        // Cross-Entropy Loss
+        // cost = -1 / n * sum(y * ln(y_hat) + (1 - y) * ln(1 - y_hat))
         decimal cost = 0.0;
         for (size_t o = 0; o < ideal_outputs.size(); ++o) {
-            decimal error = hidden_layers.back()[o].GetOutput() - ideal_outputs[o];
-            cost += error * error;
+            decimal y = ideal_outputs[o];
+            decimal y_hat = hidden_layers.back()[o].GetOutput();
+            cost += y * log(y_hat) + (1 - y) * log(1 - y_hat);
         }
-        return cost / (2 * ideal_outputs.size());
+        return -cost / ideal_outputs.size();
     }
 
     void FeedForward () {

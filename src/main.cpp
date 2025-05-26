@@ -12,6 +12,8 @@
 using namespace std;
 using decimal = float;
 
+const string section = "---------------------------------------------";
+
 // Network Architecture
 const int INPUT_SIZE = 4;
 const int OUTPUT_SIZE = 2;
@@ -129,7 +131,7 @@ int main() {
         }
     }
 
-    // cout << "\n--------------------------------------------------------------------------------" << endl;
+    // cout << "\n" << section << endl;
     // cout << "\nPost-train Results:\n\n";
 
     for (auto& d : training_dataset) {
@@ -152,7 +154,7 @@ int main() {
         // cout << "\n" << endl;
     }
 
-    // cout << "--------------------------------------------------------------------------------" << endl;
+    // cout << section << endl;
     // cout << "\nValidation Results:\n";
 
     for (auto& d : validation_dataset) {
@@ -193,7 +195,7 @@ int main() {
         return (decimal(correct_count) / dataset.size()) * 100.0f;
     };
 
-    cout << "--------------------------------------------------------------------------------" << endl;
+    cout << section << endl;
 
     decimal train_accuracy = compute_accuracy(training_dataset);
     cout << "\nTraining Data Accuracy   (error ≤ " << ERROR_THRESHOLD << "%): " 
